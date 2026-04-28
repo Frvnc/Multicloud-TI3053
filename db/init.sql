@@ -22,7 +22,7 @@ INSERT INTO pacientes (rut, nombre, email) VALUES
 
 INSERT INTO examenes (paciente_id, tipo_examen, nombre_archivo) VALUES
 (1, 'laboratorio', 'lab_001.pdf'),
-(1, 'imagenologia', 'rx_001.dcm'),
+(1, 'imagenologia', 'rx_001.jpg'),
 (2, 'laboratorio', 'lab_002.pdf'),
 (2, 'imagenologia', 'tac_001.jpg'),
 (3, 'laboratorio', 'lab_003.pdf'),
