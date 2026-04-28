@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HHHA - Resultados</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 2rem; }
+        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h2 { color: #2c3e50; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #2980b9; }
+        .examen-card { background-color: #f8f9fa; border-left: 4px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; }
+        .error { color: #e74c3c; text-align: center; margin-top: 15px; font-weight: bold; }
+        a { display: inline-block; margin-top: 10px; color: #fff; background-color: #2ecc71; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 14px; }
+        a:hover { background-color: #27ae60; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Portal de Pacientes HHHA</h2>
+        <p style="text-align: center; color: #7f8c8d;">Consulta de resultados en línea</p>
+        
+        <input type="text" id="rutInput" placeholder="Ingrese su RUT (ej: 12.345.678-9)">
+        <button onclick="buscarExamenes()">Consultar Exámenes</button>
+
+        <div id="resultados"></div>
+    </div>
+
+    <script>
+        async function buscarExamenes() {
+            const rut = document.getElementById('rutInput').value;
+            const resultadosDiv = document.getElementById('resultados');
+            
+            if(!rut) return;
+            
+            resultadosDiv.innerHTML = '<p style="text-align:center;">Buscando en la base de datos...</p>';
+
+            try {
+                // Hacemos el fetch a nuestro backend local en FastAPI
+                const response = await fetch(`http://localhost:8000/api/resultados/${rut}`);
+                
+                if (!response.ok) {
+                    throw new Error('Paciente no encontrado o RUT inválido.');
+                }
+
+                const data = await response.json();
+                
+                let html = `
+                    <div style="margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                        <strong>Paciente:</strong> ${data.paciente.nombre} <br>
+                        <strong>Email:</strong> ${data.paciente.email}
+                    </div>
+                    <h3 style="color: #2c3e50;">Exámenes Disponibles:</h3>
+                `;
+
+                data.examenes.forEach(ex => {
+                    html += `
+                        <div class="examen-card">
+                            <p style="margin: 0 0 5px 0;"><strong>Tipo:</strong> ${ex.tipo_examen.toUpperCase()}</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">Documento: ${ex.nombre_archivo}</p>
+                            <a href="${ex.url_descarga}" target="_blank">Descargar Resultado</a>
+                        </div>
+                    `;
+                });
+
+                resultadosDiv.innerHTML = html;
+
+            } catch (error) {
+                resultadosDiv.innerHTML = `<p class="error">${error.message}</p>`;
+            }
+        }
+    </script>
+
+</body>
+</html>
