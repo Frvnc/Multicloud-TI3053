@@ -3,88 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HHHA - Resultados</title>
+    <title>HHHA - Portal de Pacientes</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 2rem; }
-        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        h2 { color: #2c3e50; text-align: center; }
-        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #2980b9; }
-        .examen-card { background-color: #f8f9fa; border-left: 4px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; }
-        .error { color: #e74c3c; text-align: center; margin-top: 15px; font-weight: bold; }
-        a { display: inline-block; margin-top: 10px; color: #fff; background-color: #2ecc71; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 14px; }
-        a:hover { background-color: #27ae60; }
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2ecc71;
+            --secondary-dark: #27ae60;
+            --error: #e74c3c;
+            --text: #2c3e50;
+            --light-gray: #f8f9fa;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 2rem; color: var(--text); }
+        
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        h2 { text-align: center; margin-bottom: 0.5rem; color: var(--text); }
+        
+        .search-box { margin-top: 2rem; position: relative; }
+        
+        input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; box-sizing: border-box; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        button { 
+            width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; 
+            border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; 
+            transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        button:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; }
+
+        /* Aanimacion de carga (spinner) */
+        .spinner {
+            width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #resultados { margin-top: 25px; transition: opacity 0.4s ease; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .examen-card { 
+            background-color: var(--light-gray); border-left: 5px solid var(--primary); 
+            padding: 15px; margin-top: 15px; border-radius: 8px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .btn-view { background-color: var(--secondary); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-size: 14px; border: none; cursor: pointer; }
+        .btn-view:hover { background-color: var(--secondary-dark); }
+
+        .error-msg { color: var(--error); text-align: center; background: #fdf2f2; padding: 10px; border-radius: 8px; border: 1px solid #f9d6d6; }
+
+        /* Estilos del Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
+        .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 12px; width: 80%; max-width: 800px; position: relative; }
+        .close { position: absolute; right: 20px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
+        .close:hover { color: #000; }
+        #modal-body { text-align: center; min-height: 300px; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Portal de Pacientes HHHA</h2>
-        <p style="text-align: center; color: #7f8c8d;">Consulta de resultados en línea</p>
+        <p style="text-align: center; color: #7f8c8d; margin-top: 0;">Centro de Diagnóstico e Imagenología</p>
         
-        <input type="text" id="rutInput" placeholder="Ingrese su RUT (ej: 12.345.678-9)">
-        <button onclick="buscarExamenes()">Consultar Exámenes</button>
+        <div class="search-box">
+            <input type="text" id="rutInput" placeholder="Ej: 12.345.678-9" onkeypress="if(event.key === 'Enter') buscarExamenes()">
+            <button id="btnBuscar" onclick="buscarExamenes()">
+                <div id="spinner" class="spinner"></div>
+                <span id="btnText">Consultar Exámenes</span>
+            </button>
+        </div>
 
         <div id="resultados"></div>
     </div>
 
-    <script>
-        async function buscarExamenes() {
-            const inputRut = document.getElementById('rutInput').value;
-            const resultadosDiv = document.getElementById('resultados');
-            
-            if(!inputRut) return;
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <div id="modal-body">
+                </div>
+        </div>
+    </div>
 
-            // Limpiamos el RUT de espacios para evitar errores de fetch
-            const rut = inputRut.trim();
+    <script>
+        const btnBuscar = document.getElementById('btnBuscar');
+        const btnText = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        const resultadosDiv = document.getElementById('resultados');
+
+        // Funcion para limpiar rutt
+        function limpiarRut(rut) {
+            return rut.replace(/[.\s-]/g, '').toLowerCase();
+        }
+
+        async function buscarExamenes() {
+            const inputValue = document.getElementById('rutInput').value;
+            if(!inputValue) return;
+
+            const rut = limpiarRut(inputValue);
             
-            resultadosDiv.innerHTML = '<p style="text-align:center;">Buscando en la base de datos...</p>';
+            // Estado de carga
+            btnBuscar.disabled = true;
+            spinner.style.display = 'block';
+            btnText.innerText = 'Buscando...';
+            resultadosDiv.style.opacity = '0.4';
 
             try {
-                // LLAMADA AL BACKEND EN AWS (Puerto 8000)
-                // usamos la ip pblica y el endpoint /paciente/
-                const response = await fetch('http://98.85.187.238:8000/paciente/' + rut);
+                // ip elastica configurada anteriormente
+                const response = await fetch(`http://98.85.187.238:8000/paciente/${rut}`);
                 
                 if (!response.ok) {
-                    if(response.status === 404) {
-                        throw new Error('Paciente no encontrado en el sistema.');
-                    }
-                    throw new Error('Error al conectar con el servidor.');
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al consultar el sistema.');
                 }
 
                 const data = await response.json();
-                
-                let html = `
-                    <div style="margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                        <strong>Paciente:</strong> ${data.paciente.nombre} <br>
-                        <strong>Email:</strong> ${data.paciente.email}
-                    </div>
-                    <h3 style="color: #2c3e50;">Exámenes Disponibles:</h3>
-                `;
-
-                if (data.examenes.length === 0) {
-                    html += '<p>No hay exámenes registrados para este paciente.</p>';
-                } else {
-                    data.examenes.forEach(ex => {
-                        html += `
-                            <div class="examen-card">
-                                <p style="margin: 0 0 5px 0;"><strong>Tipo:</strong> ${ex.tipo_examen.toUpperCase()}</p>
-                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">Archivo: ${ex.nombre_archivo}</p>
-                                <a href="${ex.url_descarga}" target="_blank">Descargar Resultado</a>
-                            </div>
-                        `;
-                    });
-                }
-
-                resultadosDiv.innerHTML = html;
+                renderizarResultados(data);
 
             } catch (error) {
-                console.error("Error en el fetch:", error);
-                resultadosDiv.innerHTML = `<p class="error">${error.message}</p>`;
+                resultadosDiv.innerHTML = `<div class="error-msg">${error.message}</div>`;
+                resultadosDiv.style.opacity = '1';
+            } finally {
+                btnBuscar.disabled = false;
+                spinner.style.display = 'none';
+                btnText.innerText = 'Consultar Exámenes';
             }
         }
-    </script>
 
+        function renderizarResultados(data) {
+            resultadosDiv.style.opacity = '1';
+            resultadosDiv.classList.remove('fade-in');
+            void resultadosDiv.offsetWidth; 
+            resultadosDiv.classList.add('fade-in');
+
+            let html = `
+                <div style="background: #eef7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>Paciente:</strong> ${data.paciente.nombre} <br>
+                    <strong>Estado:</strong> Historial cargado correctamente
+                </div>
+                <h3 style="font-size: 18px;">Exámenes Disponibles:</h3>
+            `;
+
+            if (data.examenes.length === 0) {
+                html += '<p>No se encontraron resultados para este paciente.</p>';
+            } else {
+                data.examenes.forEach(ex => {
+                    html += `
+                        <div class="examen-card">
+                            <div>
+                                <strong>${ex.tipo_examen.toUpperCase()}</strong><br>
+                                <small style="color: #666;">${ex.nombre_archivo}</small>
+                            </div>
+                            <button class="btn-view" onclick="abrirVistaPrevia('${ex.url_descarga}', '${ex.tipo_examen}')">
+                                Ver Resultado
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+            resultadosDiv.innerHTML = html;
+        }
+
+        function abrirVistaPrevia(url, tipo) {
+            const modal = document.getElementById('previewModal');
+            const body = document.getElementById('modal-body');
+            modal.style.display = "block";
+            body.innerHTML = '<p>Cargando previsualización...</p>';
+
+            if (tipo.toLowerCase() === 'imagenologia') {
+                // Previsualizar imagen de S3
+                body.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 70vh; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">`;
+            } else {
+                // Previsualizar PDF de Azure
+                body.innerHTML = `<iframe src="${url}" width="100%" height="500px" style="border: none;"></iframe>`;
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('previewModal').style.display = "none";
+            document.getElementById('modal-body').innerHTML = '';
+        }
+
+        // Cerrar modal al hacer clic fuera de el
+        window.onclick = function(event) {
+            const modal = document.getElementById('previewModal');
+            if (event.target == modal) cerrarModal();
+        }
+    </script>
 </body>
 </html>
