@@ -3,77 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HHHA - Portal de Pacientes</title>
+    <title>HHHA - Portal de Pacientes Pro</title>
     <style>
         :root {
             --primary: #3498db;
-            --primary-dark: #2980b9;
-            --secondary: #2ecc71;
-            --secondary-dark: #27ae60;
+            --primary-dark: #217dbb;
+            --secondary: #27ae60;
+            --secondary-dark: #1e8449;
+            --bg: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
             --error: #e74c3c;
-            --text: #2c3e50;
-            --light-gray: #f8f9fa;
         }
 
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 2rem; color: var(--text); }
-        
-        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        
-        h2 { text-align: center; margin-bottom: 0.5rem; color: var(--text); }
-        
-        .search-box { margin-top: 2rem; position: relative; }
-        
-        input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; box-sizing: border-box; }
-        input:focus { border-color: var(--primary); outline: none; }
-        
-        button { 
-            width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; 
-            border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; 
-            transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px;
+        body { 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            padding: 2rem; 
+            color: var(--text-main);
+            line-height: 1.6;
         }
-        button:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+
+        .container { 
+            max-width: 650px; 
+            margin: 0 auto; 
+            background: var(--card-bg); 
+            padding: 3rem; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+        }
+
+        header { text-align: center; margin-bottom: 2.5rem; }
+        h2 { margin: 0; color: var(--text-main); font-size: 1.8rem; }
+        header p { color: var(--text-muted); margin: 5px 0 0; }
+
+        .search-box { margin-bottom: 2rem; }
+        
+        input { 
+            width: 100%; 
+            padding: 14px 18px; 
+            margin-bottom: 15px; 
+            border: 2px solid #e1e8ed; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            transition: all 0.3s; 
+            box-sizing: border-box; 
+            background: #fdfdfd;
+        }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1); }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px;
+        }
+        button:hover { background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3); }
+        button:active { transform: translateY(0); }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; }
 
         .spinner {
             width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;
+            border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite;
             display: none;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #resultados { margin-top: 25px; transition: opacity 0.4s ease; }
-        .fade-in { animation: fadeIn 0.5s ease-in; }
+        #resultados { margin-top: 30px; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .examen-card { 
-            background-color: var(--light-gray); border-left: 5px solid var(--primary); 
-            padding: 15px; margin-top: 15px; border-radius: 8px; 
-            display: flex; justify-content: space-between; align-items: center;
+        .paciente-info { 
+            background: #eff6ff; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 25px;
+            border: 1px solid #dbeafe;
         }
-        
-        .btn-view { background-color: var(--secondary); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-size: 14px; border: none; cursor: pointer; }
+
+        .examen-card { 
+            background-color: white; 
+            border: 1px solid #eef2f6;
+            border-left: 6px solid var(--primary); 
+            padding: 20px; 
+            margin-top: 15px; 
+            border-radius: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .examen-card:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-color: var(--primary); }
+
+        .btn-view { 
+            background-color: var(--secondary); 
+            color: white; 
+            padding: 10px 18px; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: 600;
+            border: none; 
+            cursor: pointer;
+            transition: background 0.2s;
+        }
         .btn-view:hover { background-color: var(--secondary-dark); }
 
-        .error-msg { color: var(--error); text-align: center; background: #fdf2f2; padding: 10px; border-radius: 8px; border: 1px solid #f9d6d6; }
+        /* Modal Glassmorphism */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0; top: 0; 
+            width: 100%; height: 100%; 
+            background-color: rgba(15, 23, 42, 0.7); 
+            backdrop-filter: blur(8px); 
+        }
+        .modal-content { 
+            background-color: #fff; 
+            margin: 2% auto; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 950px; 
+            position: relative; 
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .close { 
+            position: absolute; 
+            right: 20px; top: 15px; 
+            font-size: 24px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #64748b;
+            background: #f1f5f9;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            z-index: 2100;
+        }
+        .close:hover { background: #e2e8f0; color: #0f172a; }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 12px; width: 80%; max-width: 800px; position: relative; }
-        .close { position: absolute; right: 20px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
-        .close:hover { color: #000; }
-        #modal-body { text-align: center; min-height: 300px; display: flex; justify-content: center; align-items: center; }
+        #modal-body { min-height: 500px; display: flex; flex-direction: column; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Portal de Pacientes HHHA</h2>
-        <p style="text-align: center; color: #7f8c8d; margin-top: 0;">Centro de Diagnóstico e Imagenología</p>
+        <header>
+            <h2>Portal de Pacientes HHHA</h2>
+            <p>Consulta de Diagnóstico e Imagenología</p>
+        </header>
         
         <div class="search-box">
-            <input type="text" id="rutInput" placeholder="Ej: 12.345.678-9" onkeypress="if(event.key === 'Enter') buscarExamenes()">
+            <input type="text" id="rutInput" placeholder="Ingrese su RUT (ej: 12.345.678-9)" onkeypress="if(event.key === 'Enter') buscarExamenes()">
             <button id="btnBuscar" onclick="buscarExamenes()">
                 <div id="spinner" class="spinner"></div>
-                <span id="btnText">Consultar Exámenes</span>
+                <span id="btnText">Consultar Resultados</span>
             </button>
         </div>
 
@@ -105,36 +203,30 @@
             
             btnBuscar.disabled = true;
             spinner.style.display = 'block';
-            btnText.innerText = 'Buscando...';
-            resultadosDiv.style.opacity = '0.4';
+            btnText.innerText = 'Consultando...';
+            resultadosDiv.style.opacity = '0.3';
 
             try {
-                // LLAMADA AL BACKEND CON FORZADO DE CORS
                 const response = await fetch(`http://98.85.187.238:8000/paciente/${rut}`, {
                     method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
+                    mode: 'cors'
                 });
                 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Error al consultar el sistema.');
+                    throw new Error(errorData.detail || 'No se encontró el RUT ingresado.');
                 }
 
                 const data = await response.json();
                 renderizarResultados(data);
 
             } catch (error) {
-                console.error("Error capturado:", error);
-                resultadosDiv.innerHTML = `<div class="error-msg">${error.message}</div>`;
+                resultadosDiv.innerHTML = `<div style="color:#e74c3c; text-align:center; font-weight:600; padding:20px; background:#fef2f2; border-radius:12px;">${error.message}</div>`;
                 resultadosDiv.style.opacity = '1';
             } finally {
                 btnBuscar.disabled = false;
                 spinner.style.display = 'none';
-                btnText.innerText = 'Consultar Exámenes';
+                btnText.innerText = 'Consultar Resultados';
             }
         }
 
@@ -146,25 +238,26 @@
             resultadosDiv.classList.add('fade-in');
 
             let html = `
-                <div style="background: #eef7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <strong>Paciente:</strong> ${data.paciente.nombre} <br>
-                    <strong>Email:</strong> ${data.paciente.email}
+                <div class="paciente-info">
+                    <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #3b82f6; font-weight: 700; margin-bottom: 5px;">Paciente Encontrado</div>
+                    <div style="font-size: 1.2rem; font-weight: 700;">${data.paciente.nombre}</div>
+                    <div style="color: #64748b; font-size: 0.95rem;">${data.paciente.email}</div>
                 </div>
-                <h3 style="font-size: 18px;">Exámenes Disponibles:</h3>
+                <h3 style="font-size: 1.1rem; margin-bottom: 15px; padding-left: 5px;">Resultados Disponibles</h3>
             `;
 
             if (!data.examenes || data.examenes.length === 0) {
-                html += '<p>No se encontraron resultados para este paciente.</p>';
+                html += '<p style="text-align:center; color:#94a3b8;">No registra exámenes en el sistema.</p>';
             } else {
                 data.examenes.forEach(ex => {
                     html += `
                         <div class="examen-card">
                             <div>
-                                <strong>${ex.tipo_examen.toUpperCase()}</strong><br>
-                                <small style="color: #666;">${ex.nombre_archivo}</small>
+                                <div style="font-weight: 700; color: #1e293b;">${ex.tipo_examen.toUpperCase()}</div>
+                                <div style="font-size: 0.85rem; color: #64748b;">ID: ${ex.nombre_archivo}</div>
                             </div>
                             <button class="btn-view" onclick="abrirVistaPrevia('${ex.url_descarga}', '${ex.tipo_examen}')">
-                                Ver Resultado
+                                Ver Detalle
                             </button>
                         </div>
                     `;
@@ -177,23 +270,30 @@
             const modal = document.getElementById('previewModal');
             const body = document.getElementById('modal-body');
             modal.style.display = "block";
-            body.innerHTML = '<p>Cargando previsualización...</p>';
+            document.body.style.overflow = 'hidden'; // Bloquear scroll de fondo
 
             if (tipo.toLowerCase() === 'imagenologia') {
-                body.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 75vh; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">`;
+                body.innerHTML = `
+                    <div style="background: #1e293b; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <img src="${url}" style="max-width: 100%; max-height: 75vh; border-radius: 8px; shadow: 0 20px 25px -5px rgba(0,0,0,0.4);">
+                        <div style="color: white; margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">Visor de Imagenología Digital HHHA</div>
+                    </div>
+                `;
             } else {
-                body.innerHTML = `<iframe src="${url}" width="100%" height="550px" style="border: none;"></iframe>`;
+                body.innerHTML = `
+                    <iframe src="${url}" width="100%" height="700px" style="border: none;"></iframe>
+                `;
             }
         }
 
         function cerrarModal() {
             document.getElementById('previewModal').style.display = "none";
+            document.body.style.overflow = 'auto'; // Liberar scroll
             document.getElementById('modal-body').innerHTML = '';
         }
 
         window.onclick = function(event) {
-            const modal = document.getElementById('previewModal');
-            if (event.target == modal) cerrarModal();
+            if (event.target.className === 'modal') cerrarModal();
         }
     </script>
 </body>

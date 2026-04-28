@@ -22,3 +22,4 @@ jobs:
             git pull origin main
             # Reconstruye solo lo necesario sin tirar la DB
             docker compose up -d --build frontend backend
+            
