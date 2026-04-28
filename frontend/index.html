@@ -34,7 +34,6 @@
         button:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; }
 
-        /* Aanimacion de carga (spinner) */
         .spinner {
             width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;
@@ -57,7 +56,6 @@
 
         .error-msg { color: var(--error); text-align: center; background: #fdf2f2; padding: 10px; border-radius: 8px; border: 1px solid #f9d6d6; }
 
-        /* Estilos del Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
         .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 12px; width: 80%; max-width: 800px; position: relative; }
         .close { position: absolute; right: 20px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
@@ -85,8 +83,7 @@
     <div id="previewModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="cerrarModal()">&times;</span>
-            <div id="modal-body">
-                </div>
+            <div id="modal-body"></div>
         </div>
     </div>
 
@@ -96,7 +93,6 @@
         const spinner = document.getElementById('spinner');
         const resultadosDiv = document.getElementById('resultados');
 
-        // Funcion para limpiar rutt
         function limpiarRut(rut) {
             return rut.replace(/[.\s-]/g, '').toLowerCase();
         }
@@ -107,15 +103,21 @@
 
             const rut = limpiarRut(inputValue);
             
-            // Estado de carga
             btnBuscar.disabled = true;
             spinner.style.display = 'block';
             btnText.innerText = 'Buscando...';
             resultadosDiv.style.opacity = '0.4';
 
             try {
-                // ip elastica configurada anteriormente
-                const response = await fetch(`http://98.85.187.238:8000/paciente/${rut}`);
+                // LLAMADA AL BACKEND CON FORZADO DE CORS
+                const response = await fetch(`http://98.85.187.238:8000/paciente/${rut}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -126,6 +128,7 @@
                 renderizarResultados(data);
 
             } catch (error) {
+                console.error("Error capturado:", error);
                 resultadosDiv.innerHTML = `<div class="error-msg">${error.message}</div>`;
                 resultadosDiv.style.opacity = '1';
             } finally {
@@ -137,6 +140,7 @@
 
         function renderizarResultados(data) {
             resultadosDiv.style.opacity = '1';
+            resultadosDiv.innerHTML = '';
             resultadosDiv.classList.remove('fade-in');
             void resultadosDiv.offsetWidth; 
             resultadosDiv.classList.add('fade-in');
@@ -144,12 +148,12 @@
             let html = `
                 <div style="background: #eef7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <strong>Paciente:</strong> ${data.paciente.nombre} <br>
-                    <strong>Estado:</strong> Historial cargado correctamente
+                    <strong>Email:</strong> ${data.paciente.email}
                 </div>
                 <h3 style="font-size: 18px;">Exámenes Disponibles:</h3>
             `;
 
-            if (data.examenes.length === 0) {
+            if (!data.examenes || data.examenes.length === 0) {
                 html += '<p>No se encontraron resultados para este paciente.</p>';
             } else {
                 data.examenes.forEach(ex => {
@@ -176,11 +180,9 @@
             body.innerHTML = '<p>Cargando previsualización...</p>';
 
             if (tipo.toLowerCase() === 'imagenologia') {
-                // Previsualizar imagen de S3
-                body.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 70vh; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">`;
+                body.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 75vh; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">`;
             } else {
-                // Previsualizar PDF de Azure
-                body.innerHTML = `<iframe src="${url}" width="100%" height="500px" style="border: none;"></iframe>`;
+                body.innerHTML = `<iframe src="${url}" width="100%" height="550px" style="border: none;"></iframe>`;
             }
         }
 
@@ -189,7 +191,6 @@
             document.getElementById('modal-body').innerHTML = '';
         }
 
-        // Cerrar modal al hacer clic fuera de el
         window.onclick = function(event) {
             const modal = document.getElementById('previewModal');
             if (event.target == modal) cerrarModal();
