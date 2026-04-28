@@ -39,8 +39,8 @@
             resultadosDiv.innerHTML = '<p style="text-align:center;">Buscando en la base de datos...</p>';
 
             try {
-                // Hacemos el fetch a nuestro backend local en FastAPI
-                const response = await fetch(`http://localhost:8000/api/resultados/${rut}`);
+                // Hacemos el fetch a nuestro backend  en FastAPI
+                const response = await fetch('http://54.224.86.211:8000/paciente/' + rut);
                 
                 if (!response.ok) {
                     throw new Error('Paciente no encontrado o RUT inválido.');
