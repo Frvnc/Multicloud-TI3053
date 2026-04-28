@@ -31,19 +31,26 @@
 
     <script>
         async function buscarExamenes() {
-            const rut = document.getElementById('rutInput').value;
+            const inputRut = document.getElementById('rutInput').value;
             const resultadosDiv = document.getElementById('resultados');
             
-            if(!rut) return;
+            if(!inputRut) return;
+
+            // Limpiamos el RUT de espacios para evitar errores de fetch
+            const rut = inputRut.trim();
             
             resultadosDiv.innerHTML = '<p style="text-align:center;">Buscando en la base de datos...</p>';
 
             try {
-                // Hacemos el fetch a nuestro backend  en FastAPI
+                // LLAMADA AL BACKEND EN AWS (Puerto 8000)
+                // usamos la ip pblica y el endpoint /paciente/
                 const response = await fetch('http://54.224.86.211:8000/paciente/' + rut);
                 
                 if (!response.ok) {
-                    throw new Error('Paciente no encontrado o RUT inválido.');
+                    if(response.status === 404) {
+                        throw new Error('Paciente no encontrado en el sistema.');
+                    }
+                    throw new Error('Error al conectar con el servidor.');
                 }
 
                 const data = await response.json();
@@ -56,19 +63,24 @@
                     <h3 style="color: #2c3e50;">Exámenes Disponibles:</h3>
                 `;
 
-                data.examenes.forEach(ex => {
-                    html += `
-                        <div class="examen-card">
-                            <p style="margin: 0 0 5px 0;"><strong>Tipo:</strong> ${ex.tipo_examen.toUpperCase()}</p>
-                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">Documento: ${ex.nombre_archivo}</p>
-                            <a href="${ex.url_descarga}" target="_blank">Descargar Resultado</a>
-                        </div>
-                    `;
-                });
+                if (data.examenes.length === 0) {
+                    html += '<p>No hay exámenes registrados para este paciente.</p>';
+                } else {
+                    data.examenes.forEach(ex => {
+                        html += `
+                            <div class="examen-card">
+                                <p style="margin: 0 0 5px 0;"><strong>Tipo:</strong> ${ex.tipo_examen.toUpperCase()}</p>
+                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d;">Archivo: ${ex.nombre_archivo}</p>
+                                <a href="${ex.url_descarga}" target="_blank">Descargar Resultado</a>
+                            </div>
+                        `;
+                    });
+                }
 
                 resultadosDiv.innerHTML = html;
 
             } catch (error) {
+                console.error("Error en el fetch:", error);
                 resultadosDiv.innerHTML = `<p class="error">${error.message}</p>`;
             }
         }
