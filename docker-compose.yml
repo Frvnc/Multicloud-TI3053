@@ -4,6 +4,7 @@ services:
   db:
     image: postgres:16-alpine
     container_name: hhha_db
+    restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -17,6 +18,7 @@ services:
   backend:
     build: ./backend
     container_name: hhha_backend
+    restart: always
     env_file:
       - .env
     environment:
@@ -36,6 +38,7 @@ services:
   frontend:
     build: ./frontend
     container_name: hhha_frontend
+    restart: always
     ports:
       - "80:80"
     depends_on:
@@ -49,3 +52,4 @@ networks:
 
 volumes:
   pgdata:
+    driver: local
